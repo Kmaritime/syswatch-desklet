@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Compile and install .po → .mo translation files
-UUID="syswatch@marian"
+UUID="syswatch"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOCALE_DIR="$HOME/.local/share/locale"
 

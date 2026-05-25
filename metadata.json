@@ -1,5 +1,5 @@
 {
-  "uuid":        "syswatch@marian",
+  "uuid":        "syswatch",
   "name":        "SysWatch",
   "description": "System Monitor — CPU, RAM, Docker, Netzwerk",
   "version":     "2.3",

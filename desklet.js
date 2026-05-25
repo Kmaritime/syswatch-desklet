@@ -8,7 +8,7 @@ const Mainloop = imports.mainloop;
 const Settings = imports.ui.settings;
 const Gettext  = imports.gettext;
 
-const UUID = 'syswatch@marian';
+const UUID = 'syswatch';
 
 // ─── i18n ─────────────────────────────────────────────────────────────────────
 Gettext.bindtextdomain(UUID, GLib.get_home_dir() + '/.local/share/locale');

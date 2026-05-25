@@ -2,7 +2,7 @@
 # Copyright (C) 2026
 msgid ""
 msgstr ""
-"Project-Id-Version: SysWatch 2.2\n"
+"Project-Id-Version: SysWatch 2.3\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
