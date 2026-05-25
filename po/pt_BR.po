@@ -1,0 +1,51 @@
+# SysWatch — pt_BR
+msgid ""
+msgstr ""
+"Language: pt_BR\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "NETWORK"
+msgstr "REDE"
+
+msgid "CPU GOVERNOR"
+msgstr "GOVERNADOR CPU"
+
+msgid "GPU"
+msgstr "GPU"
+
+msgid "DOCKER"
+msgstr "DOCKER"
+
+msgid "not available"
+msgstr "não disponível"
+
+msgid "no containers"
+msgstr "sem contêineres"
+
+msgid "more"
+msgstr "mais"
+
+msgid "Load"
+msgstr "Carga"
+
+msgid "Intel iGPU"
+msgstr "Intel iGPU"
+
+msgid "AMD GPU"
+msgstr "AMD GPU"
+
+msgid "NVIDIA GPU"
+msgstr "NVIDIA GPU"
+
+msgid "Qualcomm Adreno"
+msgstr "Qualcomm Adreno"
+
+msgid "ARM Mali"
+msgstr "ARM Mali"
+
+msgid "VideoCore GPU"
+msgstr "VideoCore GPU"
+
+msgid "no GPU detected"
+msgstr "nenhuma GPU detectada"

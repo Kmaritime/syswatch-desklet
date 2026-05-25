@@ -1,0 +1,138 @@
+{
+  "layout": {
+    "type": "layout",
+    "pages": ["general", "network", "display"],
+
+    "general": {
+      "type": "page",
+      "title": "Allgemein",
+      "sections": ["timings", "modules", "docker-cfg"]
+    },
+    "network": {
+      "type": "page",
+      "title": "Netzwerk",
+      "sections": ["hosts-section"]
+    },
+    "display": {
+      "type": "page",
+      "title": "Darstellung",
+      "sections": ["appearance"]
+    },
+
+    "timings": {
+      "type": "section",
+      "title": "Aktualisierungsintervalle",
+      "keys": ["refresh-system", "refresh-governor", "refresh-gpu", "refresh-docker", "refresh-network"]
+    },
+    "modules": {
+      "type": "section",
+      "title": "Sektionen aktivieren",
+      "keys": ["show-cpu-temp", "show-per-core", "temp-fahrenheit", "show-gpu", "docker-enabled"]
+    },
+    "docker-cfg": {
+      "type": "section",
+      "title": "Docker",
+      "keys": ["docker-max-containers"]
+    },
+    "hosts-section": {
+      "type": "section",
+      "title": "Überwachte Hosts",
+      "keys": ["network-hosts"]
+    },
+    "appearance": {
+      "type": "section",
+      "title": "Darstellung",
+      "keys": ["bar-width"]
+    }
+  },
+
+  "refresh-system": {
+    "type": "spinbutton",
+    "default": 2,
+    "min": 1, "max": 60, "step": 1,
+    "units": "Sekunden",
+    "description": "CPU / RAM"
+  },
+  "refresh-governor": {
+    "type": "spinbutton",
+    "default": 10,
+    "min": 5, "max": 120, "step": 5,
+    "units": "Sekunden",
+    "description": "CPU Governor"
+  },
+  "refresh-gpu": {
+    "type": "spinbutton",
+    "default": 3,
+    "min": 1, "max": 60, "step": 1,
+    "units": "Sekunden",
+    "description": "GPU"
+  },
+  "refresh-docker": {
+    "type": "spinbutton",
+    "default": 10,
+    "min": 5, "max": 300, "step": 5,
+    "units": "Sekunden",
+    "description": "Docker Container"
+  },
+  "refresh-network": {
+    "type": "spinbutton",
+    "default": 30,
+    "min": 10, "max": 300, "step": 10,
+    "units": "Sekunden",
+    "description": "Netzwerk Ping"
+  },
+
+  "show-cpu-temp": {
+    "type": "checkbox",
+    "default": true,
+    "description": "CPU Temperatur anzeigen"
+  },
+  "show-per-core": {
+    "type": "checkbox",
+    "default": false,
+    "description": "CPU-Kerne einzeln anzeigen"
+  },
+  "temp-fahrenheit": {
+    "type": "checkbox",
+    "default": false,
+    "description": "Temperatur in Fahrenheit (°F)"
+  },
+  "show-gpu": {
+    "type": "checkbox",
+    "default": true,
+    "description": "GPU Sektion anzeigen"
+  },
+  "docker-enabled": {
+    "type": "checkbox",
+    "default": true,
+    "description": "Docker Sektion anzeigen"
+  },
+  "docker-max-containers": {
+    "type": "spinbutton",
+    "default": 30,
+    "min": 1, "max": 100, "step": 1,
+    "units": "",
+    "description": "Maximale Anzahl Container"
+  },
+
+  "network-hosts": {
+    "type": "list",
+    "description": "Hosts (Name + IP / Hostname)",
+    "columns": [
+      {"id": "name", "title": "Name",          "default": "Host",          "type": "string"},
+      {"id": "host", "title": "IP / Hostname", "default": "192.168.179.1", "type": "string"}
+    ],
+    "default": [
+      {"name": "Router", "host": "192.168.179.1"},
+      {"name": "NAS",    "host": "192.168.179.37"}
+    ]
+  },
+
+  "bar-width": {
+    "type": "spinbutton",
+    "default": 160,
+    "min": 80, "max": 320, "step": 10,
+    "units": "px",
+    "description": "Breite der Fortschrittsbalken"
+  }
+}

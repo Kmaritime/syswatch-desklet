@@ -1,0 +1,58 @@
+# SysWatch Desklet — Translation Template
+# Copyright (C) 2026
+msgid ""
+msgstr ""
+"Project-Id-Version: SysWatch 2.2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "CPU / RAM"
+msgstr ""
+
+msgid "CPU"
+msgstr ""
+
+msgid "NETWORK"
+msgstr ""
+
+msgid "CPU GOVERNOR"
+msgstr ""
+
+msgid "GPU"
+msgstr ""
+
+msgid "DOCKER"
+msgstr ""
+
+msgid "not available"
+msgstr ""
+
+msgid "no containers"
+msgstr ""
+
+msgid "more"
+msgstr ""
+
+msgid "Load"
+msgstr ""
+
+msgid "Intel iGPU"
+msgstr ""
+
+msgid "AMD GPU"
+msgstr ""
+
+msgid "NVIDIA GPU"
+msgstr ""
+
+msgid "Qualcomm Adreno"
+msgstr ""
+
+msgid "ARM Mali"
+msgstr ""
+
+msgid "VideoCore GPU"
+msgstr ""
+
+msgid "no GPU detected"
+msgstr ""

@@ -1,0 +1,51 @@
+# SysWatch — ja
+msgid ""
+msgstr ""
+"Language: ja\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "NETWORK"
+msgstr "ネットワーク"
+
+msgid "CPU GOVERNOR"
+msgstr "CPUガバナー"
+
+msgid "GPU"
+msgstr "GPU"
+
+msgid "DOCKER"
+msgstr "DOCKER"
+
+msgid "not available"
+msgstr "利用不可"
+
+msgid "no containers"
+msgstr "コンテナなし"
+
+msgid "more"
+msgstr "他"
+
+msgid "Load"
+msgstr "負荷"
+
+msgid "Intel iGPU"
+msgstr "Intel iGPU"
+
+msgid "AMD GPU"
+msgstr "AMD GPU"
+
+msgid "NVIDIA GPU"
+msgstr "NVIDIA GPU"
+
+msgid "Qualcomm Adreno"
+msgstr "Qualcomm Adreno"
+
+msgid "ARM Mali"
+msgstr "ARM Mali"
+
+msgid "VideoCore GPU"
+msgstr "VideoCore GPU"
+
+msgid "no GPU detected"
+msgstr "GPU未検出"

@@ -1,0 +1,51 @@
+# SysWatch — ru
+msgid ""
+msgstr ""
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "NETWORK"
+msgstr "СЕТЬ"
+
+msgid "CPU GOVERNOR"
+msgstr "РЕГУЛЯТОР CPU"
+
+msgid "GPU"
+msgstr "GPU"
+
+msgid "DOCKER"
+msgstr "DOCKER"
+
+msgid "not available"
+msgstr "недоступно"
+
+msgid "no containers"
+msgstr "нет контейнеров"
+
+msgid "more"
+msgstr "ещё"
+
+msgid "Load"
+msgstr "Нагр."
+
+msgid "Intel iGPU"
+msgstr "Intel iGPU"
+
+msgid "AMD GPU"
+msgstr "AMD GPU"
+
+msgid "NVIDIA GPU"
+msgstr "NVIDIA GPU"
+
+msgid "Qualcomm Adreno"
+msgstr "Qualcomm Adreno"
+
+msgid "ARM Mali"
+msgstr "ARM Mali"
+
+msgid "VideoCore GPU"
+msgstr "VideoCore GPU"
+
+msgid "no GPU detected"
+msgstr "GPU не обнаружен"

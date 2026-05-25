@@ -1,0 +1,51 @@
+# SysWatch — nl
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "NETWORK"
+msgstr "NETWERK"
+
+msgid "CPU GOVERNOR"
+msgstr "CPU GOVERNOR"
+
+msgid "GPU"
+msgstr "GPU"
+
+msgid "DOCKER"
+msgstr "DOCKER"
+
+msgid "not available"
+msgstr "niet beschikbaar"
+
+msgid "no containers"
+msgstr "geen containers"
+
+msgid "more"
+msgstr "meer"
+
+msgid "Load"
+msgstr "Last"
+
+msgid "Intel iGPU"
+msgstr "Intel iGPU"
+
+msgid "AMD GPU"
+msgstr "AMD GPU"
+
+msgid "NVIDIA GPU"
+msgstr "NVIDIA GPU"
+
+msgid "Qualcomm Adreno"
+msgstr "Qualcomm Adreno"
+
+msgid "ARM Mali"
+msgstr "ARM Mali"
+
+msgid "VideoCore GPU"
+msgstr "VideoCore GPU"
+
+msgid "no GPU detected"
+msgstr "geen GPU gevonden"
