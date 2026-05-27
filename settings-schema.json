@@ -1,17 +1,22 @@
 {
   "layout": {
     "type": "layout",
-    "pages": ["general", "network", "display"],
+    "pages": ["general", "disk", "network", "display"],
 
     "general": {
       "type": "page",
       "title": "Allgemein",
       "sections": ["timings", "modules", "docker-cfg"]
     },
+    "disk": {
+      "type": "page",
+      "title": "Festplatten",
+      "sections": ["disk-cfg"]
+    },
     "network": {
       "type": "page",
       "title": "Netzwerk",
-      "sections": ["hosts-section"]
+      "sections": ["hosts-section", "throughput-cfg"]
     },
     "display": {
       "type": "page",
@@ -22,22 +27,32 @@
     "timings": {
       "type": "section",
       "title": "Aktualisierungsintervalle",
-      "keys": ["refresh-system", "refresh-governor", "refresh-gpu", "refresh-docker", "refresh-network"]
+      "keys": ["refresh-system", "refresh-governor", "refresh-gpu", "refresh-docker", "refresh-disk", "refresh-throughput", "refresh-network"]
     },
     "modules": {
       "type": "section",
       "title": "Sektionen aktivieren",
-      "keys": ["show-system", "show-cpu-temp", "show-per-core", "temp-fahrenheit", "show-governor", "show-gpu", "docker-enabled", "show-network"]
+      "keys": ["show-system", "show-cpu-temp", "show-per-core", "temp-fahrenheit", "show-governor", "show-gpu", "docker-enabled", "show-disk", "show-swap", "show-network", "show-throughput"]
     },
     "docker-cfg": {
       "type": "section",
       "title": "Docker",
       "keys": ["docker-max-containers"]
     },
+    "disk-cfg": {
+      "type": "section",
+      "title": "Überwachte Laufwerke",
+      "keys": ["disk-mounts"]
+    },
     "hosts-section": {
       "type": "section",
-      "title": "Überwachte Hosts",
+      "title": "Überwachte Hosts (Ping)",
       "keys": ["network-hosts"]
+    },
+    "throughput-cfg": {
+      "type": "section",
+      "title": "Netzwerkdurchsatz",
+      "keys": ["net-unit-bits"]
     },
     "appearance": {
       "type": "section",
@@ -73,6 +88,20 @@
     "min": 5, "max": 300, "step": 5,
     "units": "Sekunden",
     "description": "Docker Container"
+  },
+  "refresh-disk": {
+    "type": "spinbutton",
+    "default": 10,
+    "min": 5, "max": 120, "step": 5,
+    "units": "Sekunden",
+    "description": "Festplatten"
+  },
+  "refresh-throughput": {
+    "type": "spinbutton",
+    "default": 3,
+    "min": 1, "max": 30, "step": 1,
+    "units": "Sekunden",
+    "description": "Netzwerkdurchsatz"
   },
   "refresh-network": {
     "type": "spinbutton",
@@ -117,10 +146,25 @@
     "default": true,
     "description": "Docker Sektion anzeigen"
   },
+  "show-disk": {
+    "type": "checkbox",
+    "default": true,
+    "description": "Festplatten Sektion anzeigen"
+  },
+  "show-swap": {
+    "type": "checkbox",
+    "default": false,
+    "description": "Swap anzeigen"
+  },
   "show-network": {
     "type": "checkbox",
     "default": true,
     "description": "Netzwerk Sektion anzeigen"
+  },
+  "show-throughput": {
+    "type": "checkbox",
+    "default": true,
+    "description": "Netzwerkdurchsatz anzeigen"
   },
   "docker-max-containers": {
     "type": "spinbutton",
@@ -128,6 +172,24 @@
     "min": 1, "max": 100, "step": 1,
     "units": "",
     "description": "Maximale Anzahl Container"
+  },
+
+  "disk-mounts": {
+    "type": "list",
+    "description": "Laufwerke (Name + Einhängepunkt)",
+    "columns": [
+      {"id": "name", "title": "Name",          "default": "System", "type": "string"},
+      {"id": "path", "title": "Pfad",          "default": "/",      "type": "string"}
+    ],
+    "default": [
+      {"name": "System", "path": "/"}
+    ]
+  },
+
+  "net-unit-bits": {
+    "type": "checkbox",
+    "default": false,
+    "description": "Einheit: Mbit/s (statt MB/s)"
   },
 
   "network-hosts": {

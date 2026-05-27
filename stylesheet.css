@@ -159,6 +159,31 @@
     margin-left: 2px;
 }
 
+/* ── Network Throughput ──────────────────────────────────────────────────── */
+
+.syswatch-tp-list {
+    padding-top: 3px;
+}
+
+.syswatch-tp-row {
+    padding: 1px 0;
+}
+
+.syswatch-tp-name {
+    font-family: "JetBrains Mono", "Fira Code", "Noto Mono", monospace;
+    font-size: 11px;
+    color: #9aaac0;
+    min-width: 58px;
+    margin-right: 4px;
+}
+
+.syswatch-tp-val {
+    font-family: "JetBrains Mono", "Fira Code", "Noto Mono", monospace;
+    font-size: 11px;
+    color: #6a7288;
+    min-width: 96px;
+}
+
 /* ── Unavailable sections ────────────────────────────────────────────────── */
 
 .syswatch-section-unavail .syswatch-section-title {

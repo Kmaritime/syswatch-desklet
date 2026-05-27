@@ -52,12 +52,17 @@ SysWatchDesklet.prototype = {
     _init: function(metadata, desklet_id) {
         Desklet.Desklet.prototype._init.call(this, metadata, desklet_id);
 
-        this._cpuPrev     = null;
-        this._cpuCorePrev = [];
-        this._netRows     = {};
-        this._coreRows    = [];
-        this._timers      = [];
-        this._destroyed   = false;
+        this._cpuPrev              = null;
+        this._cpuCorePrev          = [];
+        this._netRows              = {};
+        this._coreRows             = [];
+        this._timers               = [];
+        this._destroyed            = false;
+        this._diskBars             = {};
+        this._swapRow              = null;
+        this._throughputRows       = {};
+        this._netThroughputPrev    = null;
+        this._netThroughputPrevTime = null;
 
         this.settings = new Settings.DeskletSettings(this, UUID, desklet_id);
         this._bindSettings();
@@ -85,7 +90,14 @@ SysWatchDesklet.prototype = {
         this.settings.bindProperty(IN, 'docker-enabled',   'dockerEnabled',  () => this._toggleSection(this._dockerSection, this.dockerEnabled), null);
         this.settings.bindProperty(IN, 'docker-max-containers', 'dockerMax', null, null);
         this.settings.bindProperty(IN, 'show-network',     'showNetwork',    () => this._toggleSection(this._netSection,  this.showNetwork),   null);
+        this.settings.bindProperty(IN, 'show-throughput',  'showThroughput', () => this._toggleSection(this._throughputList, this.showThroughput), null);
+        this.settings.bindProperty(IN, 'net-unit-bits',    'netUnitBits',    null, null);
         this.settings.bindProperty(IN, 'network-hosts',    'networkHosts',   () => this._rebuildNetworkRows(), null);
+        this.settings.bindProperty(IN, 'refresh-throughput', 'refreshThroughput', restart, null);
+        this.settings.bindProperty(IN, 'show-disk',        'showDisk',       () => this._toggleSection(this._diskSection,  this.showDisk),      null);
+        this.settings.bindProperty(IN, 'show-swap',        'showSwap',       () => this._toggleSwap(),         null);
+        this.settings.bindProperty(IN, 'disk-mounts',      'diskMounts',     () => this._rebuildDiskBars(),    null);
+        this.settings.bindProperty(IN, 'refresh-disk',     'refreshDisk',    restart, null);
         this.settings.bindProperty(IN, 'bar-width',        'barWidth',       null, null);
     },
 
@@ -99,6 +111,7 @@ SysWatchDesklet.prototype = {
         this._main.add_actor(new St.Widget({ style_class: 'syswatch-hsep' }));
 
         this._buildSystemSection();
+        this._buildDiskSection();
         this._buildGovernorSection();
         this._buildGpuSection();
         this._buildDockerSection();
@@ -171,6 +184,80 @@ SysWatchDesklet.prototype = {
     _togglePerCore: function() {
         if (!this._coreSub) return;
         this.showPerCore ? this._coreSub.show() : this._coreSub.hide();
+    },
+
+    // ── Disk ──────────────────────────────────────────────────────────────────
+
+    _buildDiskSection: function() {
+        this._diskSection = new St.BoxLayout({ vertical: true, style_class: 'syswatch-section' });
+        this._diskSection.add_actor(this._sectionTitle(_('DISK')));
+        this._diskList = new St.BoxLayout({ vertical: true });
+        this._diskSection.add_actor(this._diskList);
+        this._main.add_actor(this._diskSection);
+        if (this.showDisk === false) this._diskSection.hide();
+        this._rebuildDiskBars();
+    },
+
+    _rebuildDiskBars: function() {
+        if (!this._diskList) return;
+        this._diskList.get_children().forEach(c => c.destroy());
+        this._diskBars = {};
+
+        (this.diskMounts || []).forEach(m => {
+            if (!m.path) return;
+            let row = this._makeBarRow((m.name || m.path).slice(0, 12));
+            this._diskList.add_actor(row.box);
+            this._diskBars[m.path] = row;
+        });
+
+        this._swapRow = this._makeBarRow('SWAP');
+        this._diskList.add_actor(this._swapRow.box);
+        if (!this.showSwap) this._swapRow.box.hide();
+        this._updateDisk();
+    },
+
+    _toggleSwap: function() {
+        if (!this._swapRow) return;
+        this.showSwap ? this._swapRow.box.show() : this._swapRow.box.hide();
+    },
+
+    _updateDisk: function() {
+        if (this._destroyed || this.showDisk === false) return;
+        try { this._doUpdateDisk(); } catch(e) { global.logError('[SysWatch] disk: ' + e); }
+    },
+
+    _doUpdateDisk: function() {
+        (this.diskMounts || []).forEach(m => {
+            if (!m.path) return;
+            let row = this._diskBars[m.path];
+            if (!row) return;
+            try {
+                let f    = Gio.File.new_for_path(m.path);
+                let info = f.query_filesystem_info('filesystem::size,filesystem::free', null);
+                let total = info.get_attribute_uint64('filesystem::size');
+                let free  = info.get_attribute_uint64('filesystem::free');
+                let used  = total - free;
+                let pct   = total > 0 ? (used / total) * 100 : 0;
+                let toGB  = b => (b / 1073741824).toFixed(1);
+                this._setBar(row.fill, row.pct, pct,
+                    `${toGB(used)} / ${toGB(total)} G`);
+            } catch(e) { if (row.pct) row.pct.set_text('–'); }
+        });
+
+        if (this.showSwap && this._swapRow) {
+            let mem = readSync('/proc/meminfo');
+            if (mem) {
+                let gv = k => { let r = mem.match(new RegExp(k + ':\\s+(\\d+)')); return r ? +r[1] : 0; };
+                let tot = gv('SwapTotal'), free = gv('SwapFree');
+                if (tot > 0) {
+                    this._setBar(this._swapRow.fill, this._swapRow.pct,
+                        (tot - free) / tot * 100,
+                        `${((tot-free)/1048576).toFixed(1)} / ${(tot/1048576).toFixed(1)} G`);
+                } else {
+                    this._swapRow.pct.set_text(_('no swap'));
+                }
+            }
+        }
     },
 
     // ── Bar helpers ───────────────────────────────────────────────────────────
@@ -653,9 +740,13 @@ SysWatchDesklet.prototype = {
         this._netSection.add_actor(this._sectionTitle(_('NETWORK')));
         this._netList = new St.BoxLayout({ vertical: true });
         this._netSection.add_actor(this._netList);
+        this._throughputList = new St.BoxLayout({ vertical: true, style_class: 'syswatch-tp-list' });
+        this._netSection.add_actor(this._throughputList);
+        if (this.showThroughput === false) this._throughputList.hide();
         this._main.add_actor(this._netSection);
         if (this.showNetwork === false) this._netSection.hide();
         this._checkNetworkAvailable();
+        this._buildThroughputRows();
     },
 
     _checkNetworkAvailable: function() {
@@ -726,6 +817,102 @@ SysWatchDesklet.prototype = {
         });
     },
 
+    // ── Network Throughput ────────────────────────────────────────────────────
+
+    _getPhysicalInterfaces: function() {
+        let ifaces = [];
+        try {
+            let dir = Gio.File.new_for_path('/sys/class/net');
+            let en  = dir.enumerate_children('standard::name', 0, null);
+            let fi;
+            while ((fi = en.next_file(null)) !== null) {
+                let name = fi.get_name();
+                let dev  = Gio.File.new_for_path('/sys/class/net/' + name + '/device');
+                if (dev.query_exists(null)) ifaces.push(name);
+            }
+            en.close(null);
+        } catch(e) {}
+        return ifaces.sort();
+    },
+
+    _buildThroughputRows: function() {
+        if (!this._throughputList) return;
+        this._throughputList.get_children().forEach(c => c.destroy());
+        this._throughputRows = {};
+
+        let ifaces = this._getPhysicalInterfaces();
+        if (!ifaces.length) {
+            this._throughputList.add_actor(new St.Label({
+                text: _('no interfaces detected'),
+                style_class: 'syswatch-unavail-notice'
+            }));
+            return;
+        }
+        ifaces.forEach(iface => {
+            let box    = new St.BoxLayout({ style_class: 'syswatch-tp-row' });
+            let nameLbl = new St.Label({ text: iface, style_class: 'syswatch-tp-name' });
+            let rxLbl   = new St.Label({ text: '↓ –', style_class: 'syswatch-tp-val' });
+            let txLbl   = new St.Label({ text: '↑ –', style_class: 'syswatch-tp-val' });
+            box.add_actor(nameLbl);
+            box.add_actor(rxLbl);
+            box.add_actor(txLbl);
+            this._throughputList.add_actor(box);
+            this._throughputRows[iface] = { rxLbl, txLbl };
+        });
+    },
+
+    _updateThroughput: function() {
+        if (this._destroyed || this.showThroughput === false || this.showNetwork === false) return;
+        try { this._doUpdateThroughput(); } catch(e) { global.logError('[SysWatch] throughput: ' + e); }
+    },
+
+    _doUpdateThroughput: function() {
+        let data = readSync('/proc/net/dev');
+        if (!data) return;
+
+        let now     = GLib.get_monotonic_time();
+        let current = {};
+        data.split('\n').slice(2).forEach(line => {
+            line = line.trim();
+            if (!line) return;
+            let p     = line.split(/\s+/);
+            let iface = p[0].replace(':', '');
+            if (p.length >= 10) current[iface] = { rx: +p[1], tx: +p[9] };
+        });
+
+        if (this._netThroughputPrev && this._netThroughputPrevTime) {
+            let dt = (now - this._netThroughputPrevTime) / 1e6;
+            if (dt > 0.1) {
+                Object.keys(this._throughputRows).forEach(iface => {
+                    let row  = this._throughputRows[iface];
+                    let prev = this._netThroughputPrev[iface];
+                    let cur  = current[iface];
+                    if (!prev || !cur) return;
+                    let rx = Math.max(0, cur.rx - prev.rx) / dt;
+                    let tx = Math.max(0, cur.tx - prev.tx) / dt;
+                    row.rxLbl.set_text('↓ ' + this._formatBandwidth(rx));
+                    row.txLbl.set_text('↑ ' + this._formatBandwidth(tx));
+                });
+            }
+        }
+        this._netThroughputPrev     = current;
+        this._netThroughputPrevTime = now;
+    },
+
+    _formatBandwidth: function(bytesPerSec) {
+        if (this.netUnitBits) {
+            let kbits = bytesPerSec * 8 / 1000;
+            if (kbits >= 1000000) return (kbits / 1000000).toFixed(2) + ' Gbit/s';
+            if (kbits >= 1000)    return (kbits / 1000).toFixed(1)    + ' Mbit/s';
+            return kbits.toFixed(0) + ' kbit/s';
+        } else {
+            let kb = bytesPerSec / 1024;
+            if (kb >= 1048576) return (kb / 1048576).toFixed(2) + ' GB/s';
+            if (kb >= 1024)    return (kb / 1024).toFixed(2)    + ' MB/s';
+            return kb.toFixed(0) + ' KB/s';
+        }
+    },
+
     // ── Timers ────────────────────────────────────────────────────────────────
 
     _startTimers: function() {
@@ -733,14 +920,18 @@ SysWatchDesklet.prototype = {
         this._updateGovernor();
         this._updateGpu();
         this._updateDocker();
+        this._updateDisk();
+        this._updateThroughput();
         this._updateNetwork();
 
         this._timers = [
-            Mainloop.timeout_add_seconds(Math.max(1,  this.refreshSystem  ||2),  ()=>{ this._updateSystem();   return true; }),
-            Mainloop.timeout_add_seconds(Math.max(5,  this.refreshGovernor||10), ()=>{ this._updateGovernor(); return true; }),
-            Mainloop.timeout_add_seconds(Math.max(1,  this.refreshGpu     ||3),  ()=>{ this._updateGpu();      return true; }),
-            Mainloop.timeout_add_seconds(Math.max(5,  this.refreshDocker  ||10), ()=>{ this._updateDocker();   return true; }),
-            Mainloop.timeout_add_seconds(Math.max(10, this.refreshNetwork ||30), ()=>{ this._updateNetwork();  return true; })
+            Mainloop.timeout_add_seconds(Math.max(1,  this.refreshSystem     || 2),  ()=>{ this._updateSystem();      return true; }),
+            Mainloop.timeout_add_seconds(Math.max(5,  this.refreshGovernor   || 10), ()=>{ this._updateGovernor();    return true; }),
+            Mainloop.timeout_add_seconds(Math.max(1,  this.refreshGpu        || 3),  ()=>{ this._updateGpu();         return true; }),
+            Mainloop.timeout_add_seconds(Math.max(5,  this.refreshDocker     || 10), ()=>{ this._updateDocker();      return true; }),
+            Mainloop.timeout_add_seconds(Math.max(5,  this.refreshDisk       || 10), ()=>{ this._updateDisk();        return true; }),
+            Mainloop.timeout_add_seconds(Math.max(1,  this.refreshThroughput || 3),  ()=>{ this._updateThroughput();  return true; }),
+            Mainloop.timeout_add_seconds(Math.max(10, this.refreshNetwork    || 30), ()=>{ this._updateNetwork();     return true; })
         ];
     },
 

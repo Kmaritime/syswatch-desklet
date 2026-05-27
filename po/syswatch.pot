@@ -65,3 +65,12 @@ msgstr ""
 
 msgid "ping not available"
 msgstr ""
+
+msgid "DISK"
+msgstr ""
+
+msgid "no swap"
+msgstr ""
+
+msgid "no interfaces detected"
+msgstr ""
