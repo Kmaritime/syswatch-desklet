@@ -27,7 +27,7 @@
     "modules": {
       "type": "section",
       "title": "Sektionen aktivieren",
-      "keys": ["show-cpu-temp", "show-per-core", "temp-fahrenheit", "show-gpu", "docker-enabled"]
+      "keys": ["show-system", "show-cpu-temp", "show-per-core", "temp-fahrenheit", "show-governor", "show-gpu", "docker-enabled", "show-network"]
     },
     "docker-cfg": {
       "type": "section",
@@ -82,6 +82,11 @@
     "description": "Netzwerk Ping"
   },
 
+  "show-system": {
+    "type": "checkbox",
+    "default": true,
+    "description": "CPU / RAM Sektion anzeigen"
+  },
   "show-cpu-temp": {
     "type": "checkbox",
     "default": true,
@@ -97,6 +102,11 @@
     "default": false,
     "description": "Temperatur in Fahrenheit (°F)"
   },
+  "show-governor": {
+    "type": "checkbox",
+    "default": true,
+    "description": "CPU Governor Sektion anzeigen"
+  },
   "show-gpu": {
     "type": "checkbox",
     "default": true,
@@ -106,6 +116,11 @@
     "type": "checkbox",
     "default": true,
     "description": "Docker Sektion anzeigen"
+  },
+  "show-network": {
+    "type": "checkbox",
+    "default": true,
+    "description": "Netzwerk Sektion anzeigen"
   },
   "docker-max-containers": {
     "type": "spinbutton",

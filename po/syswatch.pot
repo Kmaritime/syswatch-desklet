@@ -56,3 +56,12 @@ msgstr ""
 
 msgid "no GPU detected"
 msgstr ""
+
+msgid "cpufreq not supported"
+msgstr ""
+
+msgid "docker not installed"
+msgstr ""
+
+msgid "ping not available"
+msgstr ""

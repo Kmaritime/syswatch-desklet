@@ -158,3 +158,16 @@
     min-width: 28px;
     margin-left: 2px;
 }
+
+/* ── Unavailable sections ────────────────────────────────────────────────── */
+
+.syswatch-section-unavail .syswatch-section-title {
+    color: #3a4560;
+}
+
+.syswatch-unavail-notice {
+    font-size: 11px;
+    color: #6a5030;
+    font-style: italic;
+    padding: 2px 0;
+}

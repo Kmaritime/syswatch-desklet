@@ -76,12 +76,15 @@ SysWatchDesklet.prototype = {
         this.settings.bindProperty(IN, 'refresh-gpu',           'refreshGpu',      restart, null);
         this.settings.bindProperty(IN, 'refresh-docker',        'refreshDocker',   restart, null);
         this.settings.bindProperty(IN, 'refresh-network',       'refreshNetwork',  restart, null);
+        this.settings.bindProperty(IN, 'show-system',      'showSystem',     () => this._toggleSection(this._sysSection,  this.showSystem),    null);
         this.settings.bindProperty(IN, 'show-cpu-temp',    'showCpuTemp',    () => this._toggleCpuTemp(), null);
         this.settings.bindProperty(IN, 'show-per-core',    'showPerCore',    () => this._togglePerCore(), null);
-        this.settings.bindProperty(IN, 'show-gpu',         'showGpu',        () => this._toggleGpu(),     null);
+        this.settings.bindProperty(IN, 'show-governor',    'showGovernor',   () => this._toggleSection(this._govSection,  this.showGovernor),  null);
+        this.settings.bindProperty(IN, 'show-gpu',         'showGpu',        () => this._toggleSection(this._gpuSection,  this.showGpu),       null);
         this.settings.bindProperty(IN, 'temp-fahrenheit',  'tempFahrenheit', null, null);
-        this.settings.bindProperty(IN, 'docker-enabled',   'dockerEnabled',  () => this._toggleDocker(),  null);
+        this.settings.bindProperty(IN, 'docker-enabled',   'dockerEnabled',  () => this._toggleSection(this._dockerSection, this.dockerEnabled), null);
         this.settings.bindProperty(IN, 'docker-max-containers', 'dockerMax', null, null);
+        this.settings.bindProperty(IN, 'show-network',     'showNetwork',    () => this._toggleSection(this._netSection,  this.showNetwork),   null);
         this.settings.bindProperty(IN, 'network-hosts',    'networkHosts',   () => this._rebuildNetworkRows(), null);
         this.settings.bindProperty(IN, 'bar-width',        'barWidth',       null, null);
     },
@@ -128,6 +131,7 @@ SysWatchDesklet.prototype = {
         this._main.add_actor(this._sysSection);
 
         if (!this.showCpuTemp) this._cpuTempLbl.hide();
+        if (this.showSystem === false) this._sysSection.hide();
     },
 
     _buildCoreSubsection: function() {
@@ -153,6 +157,11 @@ SysWatchDesklet.prototype = {
         this._coreSub.add_actor(cols);
         this._sysSection.add_actor(this._coreSub);
         if (!this.showPerCore) this._coreSub.hide();
+    },
+
+    _toggleSection: function(widget, show) {
+        if (!widget) return;
+        show === false ? widget.hide() : widget.show();
     },
 
     _toggleCpuTemp: function() {
@@ -207,7 +216,7 @@ SysWatchDesklet.prototype = {
     // ── System update ─────────────────────────────────────────────────────────
 
     _updateSystem: function() {
-        if (this._destroyed) return;
+        if (this._destroyed || this.showSystem === false) return;
         try { this._doUpdateSystem(); } catch(e) { global.logError('[SysWatch] system: ' + e); }
     },
 
@@ -277,10 +286,17 @@ SysWatchDesklet.prototype = {
         this._govSection.add_actor(this._govLabel);
         this._govSection.add_actor(this._freqLabel);
         this._main.add_actor(this._govSection);
+        if (this.showGovernor === false) this._govSection.hide();
+        // Synchronous check — cpufreq is either present or absent at startup
+        let gov = readSync('/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor');
+        if (!gov) {
+            this._governorUnavailable = true;
+            this._markUnavailable(this._govSection, this._govLabel, _('cpufreq not supported'));
+        }
     },
 
     _updateGovernor: function() {
-        if (this._destroyed) return;
+        if (this._destroyed || this.showGovernor === false || this._governorUnavailable) return;
         try { this._doUpdateGovernor(); } catch(e) { global.logError('[SysWatch] governor: ' + e); }
     },
 
@@ -330,11 +346,6 @@ SysWatchDesklet.prototype = {
         this._gpuSection.add_actor(this._gpuInfoLbl);
         this._main.add_actor(this._gpuSection);
         if (this.showGpu === false) this._gpuSection.hide();
-    },
-
-    _toggleGpu: function() {
-        if (!this._gpuSection) return;
-        this.showGpu === false ? this._gpuSection.hide() : this._gpuSection.show();
     },
 
     _updateGpu: function() {
@@ -554,14 +565,35 @@ SysWatchDesklet.prototype = {
         this._dockerSection.add_actor(this._dockerList);
         this._main.add_actor(this._dockerSection);
         if (this.dockerEnabled === false) this._dockerSection.hide();
+        this._checkDockerAvailable();
     },
 
-    _toggleDocker: function() {
-        this.dockerEnabled === false ? this._dockerSection.hide() : this._dockerSection.show();
+    _markUnavailable: function(section, noticeTarget, msg) {
+        if (section)
+            section.style_class = 'syswatch-section syswatch-section-unavail';
+        if (noticeTarget) {
+            noticeTarget.set_text('⚠  ' + msg);
+            noticeTarget.style_class = 'syswatch-unavail-notice';
+        }
+        return true;
+    },
+
+    _checkDockerAvailable: function() {
+        spawnAsync(['which', 'docker'], (err, out) => {
+            if (this._destroyed) return;
+            if (err || !out || !out.trim()) {
+                this._dockerUnavailable = true;
+                this._markUnavailable(this._dockerSection, null, null);
+                this._dockerList.add_actor(new St.Label({
+                    text: '⚠  ' + _('docker not installed'),
+                    style_class: 'syswatch-unavail-notice'
+                }));
+            }
+        });
     },
 
     _updateDocker: function() {
-        if (this._destroyed || this.dockerEnabled === false) return;
+        if (this._destroyed || this.dockerEnabled === false || this._dockerUnavailable) return;
         spawnAsync(['docker', 'ps', '-a', '--format', '{{json .}}'], (err, out) => {
             if (this._destroyed || !this._dockerList) return;
             try {
@@ -622,11 +654,29 @@ SysWatchDesklet.prototype = {
         this._netList = new St.BoxLayout({ vertical: true });
         this._netSection.add_actor(this._netList);
         this._main.add_actor(this._netSection);
-        this._rebuildNetworkRows();
+        if (this.showNetwork === false) this._netSection.hide();
+        this._checkNetworkAvailable();
+    },
+
+    _checkNetworkAvailable: function() {
+        spawnAsync(['which', 'ping'], (err, out) => {
+            if (this._destroyed) return;
+            if (err || !out || !out.trim()) {
+                this._networkUnavailable = true;
+                let notice = new St.Label({
+                    text: '⚠  ' + _('ping not available'),
+                    style_class: 'syswatch-unavail-notice'
+                });
+                this._netList.add_actor(notice);
+                this._markUnavailable(this._netSection, null, null);
+            } else {
+                this._rebuildNetworkRows();
+            }
+        });
     },
 
     _rebuildNetworkRows: function() {
-        if (!this._netList) return;
+        if (!this._netList || this._networkUnavailable) return;
         this._netList.get_children().forEach(c => c.destroy());
         this._netRows = {};
         (this.networkHosts || []).forEach(h => {
@@ -651,7 +701,7 @@ SysWatchDesklet.prototype = {
     },
 
     _updateNetwork: function() {
-        if (this._destroyed) return;
+        if (this._destroyed || this.showNetwork === false || this._networkUnavailable) return;
         (this.networkHosts||[]).forEach(h => { if (h.host) this._pingHost(h.host); });
     },
 
