@@ -5,6 +5,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "CPU / RAM"
+msgstr ""
+
+msgid "CPU"
+msgstr ""
+
 msgid "NETWORK"
 msgstr "МЕРЕЖА"
 
@@ -49,3 +55,21 @@ msgstr "VideoCore GPU"
 
 msgid "no GPU detected"
 msgstr "GPU не виявлено"
+
+msgid "cpufreq not supported"
+msgstr ""
+
+msgid "docker not installed"
+msgstr ""
+
+msgid "ping not available"
+msgstr ""
+
+msgid "DISK"
+msgstr ""
+
+msgid "no swap"
+msgstr ""
+
+msgid "no interfaces detected"
+msgstr ""
