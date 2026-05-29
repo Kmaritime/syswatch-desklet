@@ -1,0 +1,39 @@
+{
+  "window": {
+      "x": 2012,
+      "y": 72,
+      "width": 420,
+    "opacity": 0.88,
+    "bg_rgb": [0.04, 0.04, 0.10],
+    "corner_radius": 10
+  },
+  "refresh_interval": 5,
+  "plugins": {
+    "system_stats": {
+      "enabled": true,
+      "refresh": 2,
+      "show_per_core": false
+    },
+    "gpu_stats": {
+      "enabled": true,
+      "refresh": 3
+    },
+    "cpu_governor": {
+      "enabled": true,
+      "refresh": 10
+    },
+    "docker_status": {
+      "enabled": true,
+      "refresh": 10,
+      "max_containers": 999
+    },
+    "ip_monitor": {
+      "enabled": true,
+      "refresh": 30,
+      "hosts": [
+        {"name": "Router", "host": "192.168.179.1"},
+        {"name": "NAS",    "host": "192.168.179.37"}
+      ]
+    }
+  }
+}

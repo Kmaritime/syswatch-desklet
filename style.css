@@ -1,0 +1,86 @@
+/* SysWatch Desklet — dark HUD theme */
+
+* {
+    font-size: 12px;
+    color: #c0c8dc;
+}
+
+.monospace {
+    font-family: "JetBrains Mono", "Fira Code", "Noto Mono", "DejaVu Sans Mono", monospace;
+    font-size: 11px;
+}
+
+#header {
+    font-size: 15px;
+    font-weight: bold;
+    color: #7090e0;
+    padding: 2px 0;
+}
+
+#section-title {
+    font-size: 10px;
+    font-weight: bold;
+    color: #4a65a0;
+    letter-spacing: 1px;
+    padding: 6px 0 2px 0;
+}
+
+separator {
+    background-color: #252538;
+    min-height: 1px;
+}
+
+/* ── Progress bars ──────────────────────────────────────────────────────── */
+
+progressbar {
+    margin: 2px 0;
+}
+
+progressbar text {
+    font-size: 11px;
+    font-family: "JetBrains Mono", "Noto Mono", monospace;
+    color: #9aaac0;
+}
+
+progressbar trough {
+    background-color: #0c0c1a;
+    border-radius: 4px;
+    min-height: 16px;
+}
+
+progressbar progress {
+    background-color: #204878;
+    border-radius: 4px;
+}
+
+progressbar.warning progress {
+    background-color: #7a4c18;
+}
+
+progressbar.danger progress {
+    background-color: #7a1818;
+}
+
+/* ── Status colours ─────────────────────────────────────────────────────── */
+
+.status-ok      { color: #38c068; }
+.status-error   { color: #c03838; }
+.status-unknown { color: #585868; }
+.status-dim     { color: #707888; font-size: 11px; }
+
+/* ── Docker states ──────────────────────────────────────────────────────── */
+
+.docker-running    { color: #38c068; }
+.docker-exited     { color: #c03838; }
+.docker-paused     { color: #c09828; }
+.docker-restarting { color: #3878c0; }
+.docker-created    { color: #606070; }
+
+/* ── CPU governor ───────────────────────────────────────────────────────── */
+
+.governor-powersave    { color: #38c068; }
+.governor-performance  { color: #c03838; }
+.governor-schedutil    { color: #3878c0; }
+.governor-ondemand     { color: #c09828; }
+.governor-conservative { color: #78c038; }
+.governor-userspace    { color: #a838c0; }
